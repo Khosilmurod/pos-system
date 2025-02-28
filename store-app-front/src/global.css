@@ -1,0 +1,201 @@
+@import url('demo.css');
+@import url('font-awesome.css');
+
+.list-group-item{
+    text-decoration: none;
+    color: white;
+    /*background-color: transparent !important;*/
+    border: none !important;
+    width: 150px !important;
+    text-align: center;
+}
+body{
+    height:100%
+/*background-image: url("assets/background.svg");*/
+}
+.list-group-item:hover{
+    background-color: #3D3D3D !important;
+    color: yellow;
+}
+/*.navbar-sticky{*/
+/*    !*position: fixed;*!*/
+/*    top: 0;*/
+/*    width: 100%;*/
+/*}*/
+
+
+ul>a:hover{
+    text-decoration: none;
+    text-underline: none;
+}
+.font{
+    font-size: 16px !important;
+}
+
+
+.myNavbar{
+    /*position: sticky;*/
+    z-index: 100;
+}
+
+#root{
+    position: relative;
+}
+
+#myInput{
+    margin: 0;
+    border: none;
+    padding: 0;
+    width: 105px;
+}
+.product_image{
+    border: none;
+}
+
+.main-content{
+    width: 35%;
+    border-radius: 20px;
+    box-shadow: 0 5px 5px rgba(0,0,0,.4);
+    margin: 5em auto;
+    display: flex;
+}
+.company__info{
+    background-color: #008080;
+    border-top-left-radius: 20px;
+    border-bottom-left-radius: 20px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    color: #fff;
+}
+.fa-android{
+    font-size:3em !important;
+}
+@media screen and (max-width: 640px) {
+    .main-content{width: 90%;}
+    .company__info{
+        display: none;
+    }
+    .login_form{
+        border-top-left-radius:20px;
+        border-bottom-left-radius:20px;
+    }
+}
+@media screen and (min-width: 642px) and (max-width:800px){
+    .main-content{width: 70%;}
+}
+.row> .col > h2{
+    color:#008080;
+}
+.login_form{
+    background-color: #fff;
+    border-top-right-radius:20px;
+    border-bottom-right-radius:20px;
+    border-top:1px solid #ccc;
+    border-right:1px solid #ccc;
+}
+form{
+    padding: 0 2em;
+}
+.form__input{
+    width: 100%;
+    border:0px solid transparent;
+    border-radius: 0;
+    border-bottom: 1px solid #aaa;
+    padding: 1em .5em .5em;
+    padding-left: 2em;
+    outline:none;
+    margin:1em auto;
+    transition: all .5s ease;
+}
+.form__input:focus{
+    border-bottom-color: #008080;
+    box-shadow: 0 0 5px rgba(0,80,80,.4);
+    border-radius: 4px;
+}
+.btn-custom{
+    transition: all .5s ease;
+    width: 70%;
+    height: 55%;
+    border-radius: 30px;
+    color:#008080;
+    font-weight: 600;
+    background-color: #fff;
+    border: 1px solid #008080;
+    margin-top: 1.5em;
+    margin-bottom: 1.5em;
+}
+.btn-custom:hover, .btn-custom:focus{
+    background-color: #008080;
+    color:#fff;
+}
+
+
+/*users-card*/
+@import url('https://fonts.googleapis.com/css?family=Montserrat');
+
+
+
+
+.card-container {
+    border-radius: 5px;
+    box-shadow: 0px 10px 20px -10px rgba(0,0,0,0.75);
+    color: #B3B8CD;
+    padding-top: 30px;
+    position: relative;
+    width: 350px;
+    max-width: 100%;
+    text-align: center;
+}
+
+
+
+.card-container .pro {
+    color: #231E39;
+    background-color: #FEBB0B;
+    border-radius: 3px;
+    font-size: 14px !important;
+    font-weight: bold;
+    padding: 3px 7px;
+    position: absolute;
+    top: 30px;
+    left: 30px;
+}
+.roleName{
+    color: #231E39;
+    background-color: #FEBB0B;
+    border-radius: 3px;
+    font-size: 14px !important;
+    font-weight: bold;
+    padding: 3px 7px;
+    position: absolute;
+    bottom: 75px;
+    left: 135px;
+}
+
+.card-container .round {
+    border: 1px solid #03BFCB;
+    border-radius: 50%;
+    padding: 7px;
+}
+
+.users-image{
+    width: 150px;
+    height: 150px;
+}
+
+
+.skills {
+    text-align: left;
+    padding: 15px;
+    margin-top: 30px;
+}
+
+.button {
+    padding: 3px 7px;
+    background-color: #5DADE2;
+    border-radius: 3px;
+    font-size: 16px !important;
+    font-weight: bold;
+}
+

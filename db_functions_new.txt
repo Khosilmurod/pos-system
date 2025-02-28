@@ -1,0 +1,185 @@
+CREATE OR REPLACE FUNCTION get_parents_uz(id varchar(50))
+RETURNS varchar AS
+$$
+DECLARE
+path varchar:='';
+parent_id_one varchar:='';parent_name_one varchar:='';parent_id_two varchar:='';parent_name_two varchar:='';parent_id_three varchar:='';parent_name_three varchar:='';parent_id_four varchar:='';parent_name_four varchar:='';parent_id_five varchar:='';parent_name_five varchar:='';
+BEGIN
+	select p.category_uuid into parent_id_one from product p where cast(p.uuid as varchar(50))=id;
+	select p.name into parent_name_one from product p where cast(p.uuid as varchar(50))=id;
+	select into path CONCAT(parent_name_one, path);
+	
+		IF not parent_id_one is null THEN
+			
+			select c.parent_uuid into parent_id_two from category c where cast(c.uuid as varchar(50))=parent_id_one;
+			select c.name into parent_name_two from category c where cast(c.uuid as varchar(50))=parent_id_one;
+			select into path CONCAT(parent_name_two, ' / ',path);
+			
+			IF not parent_id_two is null THEN
+			
+			select c.parent_uuid into parent_id_three from category c where cast(c.uuid as varchar(50))=parent_id_two;
+			select c.name into parent_name_three from category c where cast(c.uuid as varchar(50))=parent_id_two;
+			select into path CONCAT(parent_name_three,' / ', path);		
+				IF not parent_id_three is null THEN
+			
+				select c.parent_uuid into parent_id_four from category c where cast(c.uuid as varchar(50))=parent_id_three;
+				select c.name into parent_name_four from category c where cast(c.uuid as varchar(50))=parent_id_three;
+				select into path CONCAT(parent_name_four,' / ', path);	
+				
+					IF not parent_id_four is null THEN
+					
+						select c.parent_uuid into parent_id_five from category c where cast(c.uuid as varchar(50))=parent_id_four;
+						select c.name into parent_name_five from category c where cast(c.uuid as varchar(50))=parent_id_four;
+						select into path CONCAT(parent_name_five,' / ', path);	
+					
+						IF not parent_id_five is null THEN
+						select into path CONCAT('... / ', path);
+						END IF;
+					END IF;
+				END IF;
+			END IF;
+		END IF;
+	RETURN path;
+END
+$$
+LANGUAGE PLPGSQL;
+
+CREATE OR REPLACE FUNCTION alphabet(id varchar(50))
+RETURNS varchar AS
+$$
+DECLARE
+path varchar:='';
+parent_id_one varchar:='';parent_name_one varchar:='';parent_id_two varchar:='';parent_name_two varchar:='';parent_id_three varchar:='';parent_name_three varchar:='';parent_id_four varchar:='';parent_name_four varchar:='';parent_id_five varchar:='';parent_name_five varchar:='';
+BEGIN
+	select p.category_uuid into parent_id_one from product p where cast(p.uuid as varchar(50))=id;
+	select substring(p.name, 1, 1) into parent_name_one from product p where cast(p.uuid as varchar(50))=id;
+	select into path CONCAT(parent_name_one, path);
+	
+		IF not parent_id_one is null THEN
+			
+			select c.parent_uuid into parent_id_two from category c where cast(c.uuid as varchar(50))=parent_id_one;
+			select substring(c.name, 1, 1) into parent_name_two from category c where cast(c.uuid as varchar(50))=parent_id_one;
+			select into path CONCAT(parent_name_two,path);
+			
+			IF not parent_id_two is null THEN
+			
+			
+			select c.parent_uuid into parent_id_three from category c where cast(c.uuid as varchar(50))=parent_id_two;
+			select substring(c.name, 1, 1) into parent_name_three from category c where cast(c.uuid as varchar(50))=parent_id_two;
+			select into path CONCAT(parent_name_three,path);
+			
+				IF not parent_id_one is null THEN
+			
+				select c.parent_uuid into parent_id_four from category c where cast(c.uuid as varchar(50))=parent_id_three;
+				select substring(c.name, 1, 1) into parent_name_four from category c where cast(c.uuid as varchar(50))=parent_id_three;
+				select into path CONCAT(parent_name_four, path);		
+				
+					IF not parent_id_four is null THEN
+						select c.parent_uuid into parent_id_five from category c where cast(c.uuid as varchar(50))=parent_id_four;
+						select substring(c.name, 1, 1) into parent_name_five from category c where cast(c.uuid as varchar(50))=parent_id_four;
+						select into path CONCAT(parent_name_five, path);	
+						
+						IF not parent_id_five is null THEN
+						END IF;
+					END IF;
+				END IF;
+			END IF;
+		END IF;
+	RETURN path;
+END
+$$
+LANGUAGE PLPGSQL;
+
+
+CREATE OR REPLACE FUNCTION get_parents_en(id varchar(50))
+RETURNS varchar AS
+$$
+DECLARE
+path varchar:='';
+parent_id_one varchar:='';parent_name_one varchar:='';parent_id_two varchar:='';parent_name_two varchar:='';parent_id_three varchar:='';parent_name_three varchar:='';parent_id_four varchar:='';parent_name_four varchar:='';parent_id_five varchar:='';parent_name_five varchar:='';
+BEGIN
+	select p.category_uuid into parent_id_one from product p where cast(p.uuid as varchar(50))=id;
+	select p.en_name into parent_name_one from product p where cast(p.uuid as varchar(50))=id;
+	select into path CONCAT(parent_name_one, path);
+	
+		IF not parent_id_one is null THEN
+			
+			select c.parent_uuid into parent_id_two from category c where cast(c.uuid as varchar(50))=parent_id_one;
+			select c.en_name into parent_name_two from category c where cast(c.uuid as varchar(50))=parent_id_one;
+			select into path CONCAT(parent_name_two, ' / ',path);
+			
+			IF not parent_id_two is null THEN
+			
+			select c.parent_uuid into parent_id_three from category c where cast(c.uuid as varchar(50))=parent_id_two;
+			select c.en_name into parent_name_three from category c where cast(c.uuid as varchar(50))=parent_id_two;
+			select into path CONCAT(parent_name_three,' / ', path);				
+				IF not parent_id_three is null THEN
+			
+				select c.parent_uuid into parent_id_four from category c where cast(c.uuid as varchar(50))=parent_id_three;
+				select c.en_name into parent_name_four from category c where cast(c.uuid as varchar(50))=parent_id_three;
+				select into path CONCAT(parent_name_four,' / ', path);	
+					IF not parent_id_four is null THEN
+						select c.parent_uuid into parent_id_five from category c where cast(c.uuid as varchar(50))=parent_id_four;
+						select c.en_name into parent_name_five from category c where cast(c.uuid as varchar(50))=parent_id_four;
+						select into path CONCAT(parent_name_five,' / ', path);	
+						IF not parent_id_five is null THEN
+						select into path CONCAT('... / ', path);
+						END IF;
+					END IF;
+				END IF;
+			END IF;
+		END IF;
+	RETURN path;
+END
+$$
+LANGUAGE PLPGSQL;
+
+
+
+CREATE or REPLACE FUNCTION deliver_amount(id varchar(50))
+RETURNS double precision AS
+$$
+DECLARE
+deliver_amount double precision;
+BEGIN
+select into deliver_amount coalesce(sum(d.amount), 0)  from deliver d where cast(d.product_uuid as varchar(50))=(id);
+RETURN deliver_amount;
+END;
+$$
+LANGUAGE PLPGSQL;
+
+CREATE or REPLACE FUNCTION trade_amount(id varchar(50))
+RETURNS double precision AS
+$$
+DECLARE
+trade_amount double precision;
+BEGIN
+select into trade_amount coalesce(sum(t.amount), 0)  from trade t where cast(t.product_uuid as varchar(50))=(id);
+RETURN trade_amount;
+END;
+$$
+LANGUAGE PLPGSQL;
+
+CREATE or REPLACE FUNCTION waste_amount(id varchar(50))
+RETURNS double precision AS
+$$
+DECLARE
+waste_amount double precision;
+BEGIN
+select into waste_amount coalesce(sum(w.amount), 0) from waste w, deliver d where w.waste_status='ACCEPTED' and w.deliver_uuid=d.uuid and cast(d.product_uuid as varchar(50))=id;
+RETURN waste_amount;
+END;
+$$
+LANGUAGE PLPGSQL;
+
+CREATE or REPLACE FUNCTION deliver_out_amount(id varchar(50))
+RETURNS double precision AS
+$$
+DECLARE
+deliver_out_amount double precision;
+BEGIN
+select into deliver_out_amount coalesce(sum(d.amount), 0)  from deliver_out d where cast(d.product_uuid as varchar(50))=(id);
+RETURN deliver_out_amount;
+END;
+$$
+LANGUAGE PLPGSQL;

@@ -1,0 +1,254 @@
+-- create extension dblink;
+-- delete from
+-- trade;
+-- delete
+-- from client;
+-- delete
+-- from deliver;
+-- delete
+-- from product;
+-- delete
+-- from attachment_content;
+-- delete
+-- from attachment;
+-- delete
+-- from category;
+-- delete
+-- from users_roles;
+-- delete
+-- from users;
+
+
+CREATE OR REPLACE PROCEDURE replication(setting character varying)
+AS
+$$
+DECLARE
+    dblink_query character varying;
+BEGIN
+    insert into users(uuid, account_non_expired, account_non_locked, credentials_non_expired, enabled, first_name,
+                      last_name, passport_number, passport_serial, password, phone_number, username)
+    values ('6564f168-f004-4bab-a81c-6321147bbb42', 'true', 'true', 'true', 'true', 'Star', 'J', '', '',
+            '$2a$10$54M5X0aktgCPLhoXZraR3uqRzV5PcSm8OOKbbaG0RWyPgQ3bpl76a', '', 'admin');
+    insert into users_roles(users_uuid, roles_id) values ('6564f168-f004-4bab-a81c-6321147bbb42', 10);
+    insert into users_roles(users_uuid, roles_id) values ('6564f168-f004-4bab-a81c-6321147bbb42', 20);
+    insert into users_roles(users_uuid, roles_id) values ('6564f168-f004-4bab-a81c-6321147bbb42', 30);
+    insert into category
+    select *
+    from dblink(
+                 setting,
+                 'select c.id, c.created_at, c.updated_at, c.name_en, c.name, c.created_by_id, updated_by_id, c.parent_id from category c where c.child = false')
+             as t(uuid uuid, created_at timestamp, updated_at timestamp, en_name character varying,
+                  name character varying, created_by_uuid uuid, updated_by_uuid uuid, parent_uuid uuid);
+    insert into attachment(uuid, content_type, original_name, size)
+    select *
+    from dblink(setting,
+                'select a.id, a.content_type, a.original_name, a.file_size from attachment a') as t(uuid uuid,
+                                                                                                    content_type character varying,
+                                                                                                    original_name character varying,
+                                                                                                    size bigint);
+    insert into attachment_content(uuid, content, attachment_id)
+    select *
+    from dblink(setting,
+                'select ac.id, ac.content, ac.attachment_id from attachment_content ac'
+             ) as (uuid uuid, content bytea, attachment_id uuid);
+    insert into product(uuid, juan, created_at, updated_at, name, created_by_uuid, updated_by_uuid, attachment_uuid,
+                        category_uuid, price, custom_cost, fare_cost, other_costs, retail_price, full_sale_price,
+                        currency_type, code)
+    select *
+    from dblink(setting,
+                '
+                select p.id,
+                    cast((select s.juan from stock s where s.product_id = p.id order by s.created_at DESC limit 1) as double precision),
+                    p.created_at,
+                    p.updated_at,
+                    c.name,
+                    p.created_by_id,
+                    p.updated_by_id,
+                    p.attachment_id,
+                    c.parent_id,
+                    cast(coalesce((select s.cost from stock s where s.product_id = p.id order by s.created_at DESC limit 1), 0) as double precision),
+                    cast(coalesce((select s.custom_cost from stock s where s.product_id = p.id order by s.created_at DESC limit 1), 0) as double precision),
+                    cast(coalesce((select s.fare_cost from stock s where s.product_id = p.id order by s.created_at DESC limit 1), 0) as double precision),
+                        (select cast(0 as double precision)),
+                    cast(coalesce((select s.retail_price from stock s where s.product_id = p.id order by s.created_at DESC limit 1), 0) as double precision),
+                    cast(coalesce((select s.wholesale_price from stock s where s.product_id = p.id order by s.created_at DESC limit 1), 0) as double precision),
+                        (select cast('' USD '' as character varying)),
+
+                    p.code
+
+                from product p left join category c on p.category_id = c.id
+                where (select s.currency_id from stock s where s.product_id = p.id order by s.created_at DESC limit 1) = 1 or (select s.currency_id from stock s where s.product_id = p.id order by s.created_at DESC limit 1) is null
+
+                '
+             ) as (
+                   uuid uuid,
+                   juan double precision,
+                   created_at timestamp,
+                   updated_at timestamp,
+                   name character varying,
+                   created_by_uuid uuid,
+                   updated_by_uuid uuid,
+                   attachment_uuid uuid,
+                   category_uuid uuid,
+                   price double precision,
+                   custom_cost double precision,
+                   other_costs double precision,
+                   fare_cost double precision,
+                   retail_price double precision,
+                   full_sale_price double precision,
+                   currency_type character varying,
+                   code character varying
+        );
+
+    insert into product(uuid, juan, created_at, updated_at, name, created_by_uuid, updated_by_uuid, attachment_uuid,
+                        category_uuid, price, custom_cost, fare_cost, other_costs, retail_price, full_sale_price,
+                        currency_type, code)
+
+    select *
+
+    from dblink(setting,
+                '
+
+                select p.id,
+
+                    cast((select s.juan from stock s where s.product_id = p.id order by s.created_at DESC limit 1) as double precision),
+
+                    p.created_at,
+
+                    p.updated_at,
+
+                    c.name,
+
+                    p.created_by_id,
+
+                    p.updated_by_id,
+
+                    p.attachment_id,
+
+                    c.parent_id,
+
+                    cast(coalesce((select s.cost from stock s where s.product_id = p.id order by s.created_at DESC limit 1), 0) as double precision),
+
+                    cast(coalesce((select s.custom_cost from stock s where s.product_id = p.id order by s.created_at DESC limit 1), 0) as double precision),
+
+                    cast(coalesce((select s.fare_cost from stock s where s.product_id = p.id order by s.created_at DESC limit 1), 0) as double precision),
+
+                        (select cast(0 as double precision)),
+
+                    cast(coalesce((select s.retail_price from stock s where s.product_id = p.id order by s.created_at DESC limit 1), 0) as double precision),
+
+                    cast(coalesce((select s.wholesale_price from stock s where s.product_id = p.id order by s.created_at DESC limit 1), 0) as double precision),
+
+                        (select cast('' UZS '' as character varying)),
+                    p.code
+
+                from product p left join category c on p.category_id = c.id
+                where (select s.currency_id from stock s where s.product_id = p.id order by s.created_at DESC limit 1) = 2
+
+                '
+             ) as (
+                   uuid uuid,
+                   juan double precision,
+                   created_at timestamp,
+                   updated_at timestamp,
+                   name character varying,
+                   created_by_uuid uuid,
+                   updated_by_uuid uuid,
+                   attachment_uuid uuid,
+                   category_uuid uuid,
+                   price double precision,
+                   fare_cost double precision,
+                   custom_cost double precision,
+                   other_costs double precision,
+                   retail_price double precision,
+                   full_sale_price double precision,
+                   currency_type character varying,
+                   code character varying
+        );
+
+    insert into deliver(uuid, created_at, updated_at, amount, currency_type, custom_cost, fare_cost, other_costs, usd,
+                        juan, price, created_by_uuid, updated_by_uuid, product_uuid)
+
+    select *
+    from dblink(
+                 setting,
+                 'select s.id, s.created_at, s.updated_at, s.all_quantity, (select cast(''UZS'' as character varying)), s.custom_cost, s.fare_cost, 0, 10205, s.juan, s.cost, s.created_by_id, s.updated_by_id, s.product_id from stock s where s.currency_id = 2')
+             as t(uuid uuid,
+                  created_at timestamp,
+                  updated_at timestamp,
+                  amount double precision,
+                  currency_type character varying,
+                  custom_cost double precision,
+                  fare_cost double precision,
+                  other_costs double precision,
+                  usd double precision,
+                  jaun double precision,
+                  price double precision,
+                  created_by_uuid uuid,
+                  updated_by_uuid uuid,
+                  product_uuid uuid
+            );
+
+    insert into deliver(uuid, created_at, updated_at, amount, currency_type, custom_cost, fare_cost, other_costs, usd,
+                        juan, price, created_by_uuid, updated_by_uuid, product_uuid)
+
+    select *
+    from dblink(
+                 setting,
+                 'select s.id, s.created_at, s.updated_at, s.all_quantity, (select cast(''USD'' as character varying)), s.custom_cost, s.fare_cost, 0, 10205, s.juan, s.cost, s.created_by_id, s.updated_by_id, s.product_id from stock s where s.currency_id = 1')
+             as t(uuid uuid,
+                  created_at timestamp,
+                  updated_at timestamp,
+                  amount double precision,
+                  currency_type character varying,
+                  custom_cost double precision,
+                  fare_cost double precision,
+                  other_costs double precision,
+                  usd double precision,
+                  jaun double precision,
+                  price double precision,
+                  created_by_uuid uuid,
+                  updated_by_uuid uuid,
+                  product_uuid uuid
+            );
+    insert into client
+    select *
+    from dblink(
+                 setting,
+                 'select c.id, c.created_at, c.updated_at,'' '' as desription, c.full_name as first_name, '' '' as last_name, '' '', c.created_by_id, c.updated_by_id from customer c') as t(uuid uuid,
+				 created_at timestamp,
+                 updated_at timestamp,
+                 description character varying,
+                 first_name character varying,
+                 last_name character varying,
+                 phone_number character varying,
+                 created_by_uuid uuid,
+                 updated_by_uuid uuid);
+    insert into trade
+    select *
+    from dblink(
+                 setting,
+                 'select s.id, s.created_at, s.updated_at, s.quantity, ''USD'', 0, (select st.retail_price from stock st where st.product_id=s.product_id limit 1), 10205, s.created_by_id, s.updated_by_id, s.product_id from sale s where (select st.currency_id from stock st where st.product_id=s.product_id limit 1)=1')
+             as t(uuid uuid, created_at timestamp, updated_at timestamp, amount double precision,
+                  currency_type character varying, discount_price double precision, retail_price double precision,
+                  usd double precision, created_by_uuid uuid, updated_by_uuid uuid, product_uuid uuid);
+				  
+				  insert into trade
+    select *
+    from dblink(
+                 setting,
+                 'select s.id, s.created_at, s.updated_at, s.quantity, ''UZS'', 0, (select st.retail_price from stock st where st.product_id=s.product_id limit 1), 10205, s.created_by_id, s.updated_by_id, s.product_id from sale s where (select st.currency_id from stock st where st.product_id=s.product_id limit 1)=2')
+             as t(uuid uuid, created_at timestamp, updated_at timestamp, amount double precision,
+                  currency_type character varying, discount_price double precision, retail_price double precision,
+                  usd double precision, created_by_uuid uuid, updated_by_uuid uuid, product_uuid uuid);
+				  
+				  
+    return;
+END
+
+$$
+    LANGUAGE PLPGSQL;
+
+
+
+call replication('dbname=storedb user=postgres password=root123');
